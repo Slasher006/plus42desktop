@@ -44,6 +44,18 @@ class equation_data {
     int eqn_index;
 };
 
+inline equation_data *new_equation_data_nothrow() {
+#if BROKEN_NOTHROW
+    try {
+        return new equation_data;
+    } catch (std::bad_alloc &) {
+        return NULL;
+    }
+#else
+    return new (std::nothrow) equation_data;
+#endif
+}
+
 struct pgm_index {
     int4 dir;
     int4 idx;

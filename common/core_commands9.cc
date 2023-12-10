@@ -58,7 +58,7 @@ int docmd_crdir(arg_struct *arg) {
     }
 
     int id = get_dir_id();
-    directory *d = new (std::nothrow) directory(id);
+    directory *d = new_directory_nothrow(id);
     if (d == NULL)
         return ERR_INSUFFICIENT_MEMORY;
     d->parent = cwd;

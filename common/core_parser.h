@@ -88,6 +88,30 @@ class CodeMap {
     int getSize() { return size; }
 };
 
+inline CodeMap *new_CodeMap_nothrow() {
+#if BROKEN_NOTHROW
+    try {
+        return new CodeMap;
+    } catch (std::bad_alloc &) {
+        return NULL;
+    }
+#else
+    return new (std::nothrow) CodeMap;
+#endif
+}
+
+inline CodeMap *new_CodeMap_nothrow(char *data, int size) {
+#if BROKEN_NOTHROW
+    try {
+        return new CodeMap(data, size);
+    } catch (std::bad_alloc &) {
+        return NULL;
+    }
+#else
+    return new (std::nothrow) CodeMap(data, size);
+#endif
+}
+
 class Lexer;
 struct prgm_struct;
 

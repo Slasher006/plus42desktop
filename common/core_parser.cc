@@ -5239,7 +5239,7 @@ static vartype *isolate2(vartype *eqn, const char *name, int length) {
         delete ev;
         return NULL;
     }
-    equation_data *neqd = new (std::nothrow) equation_data;
+    equation_data *neqd = new_equation_data_nothrow();
     if (neqd == NULL) {
         delete ev;
         return NULL;
@@ -5248,7 +5248,7 @@ static vartype *isolate2(vartype *eqn, const char *name, int length) {
     neqd->compatMode = eqd->compatMode;
     neqd->eqn_index = neq;
     if (ntext != NULL) {
-        neqd->map = new (std::nothrow) CodeMap;
+        neqd->map = new_CodeMap_nothrow();
         if (neqd->map == NULL) {
             free(ntext);
         } else {

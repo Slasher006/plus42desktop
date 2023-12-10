@@ -201,7 +201,7 @@ static equation_data *new_equation_data(const char *text, int4 length, bool comp
         if (eqn_index == -1)
             return NULL;
     }
-    equation_data *eqd = new (std::nothrow) equation_data;
+    equation_data *eqd = new_equation_data_nothrow();
     if (eqd == NULL)
         return NULL;
     eqd->length = length;
@@ -219,7 +219,7 @@ static equation_data *new_equation_data(const char *text, int4 length, bool comp
     eqd->eqn_index = eqn_index;
     eqd->compatMode = compat_mode;
 
-    CodeMap *map = new (std::nothrow) CodeMap;
+    CodeMap *map = new_CodeMap_nothrow();
     eq_dir->prgms[eqn_index].eq_data = eqd;
     Parser::generateCode(eqd->ev, eq_dir->prgms + eqn_index, map);
     if (map != NULL && map->getSize() == -1) {

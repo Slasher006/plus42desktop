@@ -4324,11 +4324,23 @@ struct prp_data_struct {
     ~prp_data_struct() { delete target_lines; }
 };
 
+inline prp_data_struct *new_prp_data_struct_nothrow() {
+#if BROKEN_NOTHROW
+    try {
+        return new prp_data_struct;
+    } catch (std::bad_alloc &) {
+        return NULL;
+    }
+#else
+    return new (std::nothrow) prp_data_struct;
+#endif
+}
+
 static prp_data_struct *prp_data;
 static int print_program_worker(bool interrupted);
 
 int print_program(pgm_index prgm, int4 pc, int4 lines, bool normal) {
-    prp_data_struct *dat = new (std::nothrow) prp_data_struct;
+    prp_data_struct *dat = new_prp_data_struct_nothrow();
     if (dat == NULL)
         return ERR_INSUFFICIENT_MEMORY;
 
@@ -4350,7 +4362,16 @@ int print_program(pgm_index prgm, int4 pc, int4 lines, bool normal) {
         dat->normal = flags.f.normal_print;
         dat->full_xstr = true;
         if (flags.f.trace_print) {
+            #if BROKEN_NOTHROW
+            std::set<int4> *target_lines;
+            try {
+                target_lines = new std::set<int4>;
+            } catch (std::bad_alloc &) {
+                target_lines = NULL;
+            }
+            #else
             std::set<int4> *target_lines = new (std::nothrow) std::set<int4>;
+            #endif
             if (target_lines == NULL) {
                 free(dat);
                 return ERR_INSUFFICIENT_MEMORY;

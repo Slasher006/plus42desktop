@@ -424,6 +424,18 @@ struct directory {
     directory *clone();
 };
 
+inline directory *new_directory_nothrow(int id) {
+#if BROKEN_NOTHROW
+    try {
+        return new directory(id);
+    } catch (std::bad_alloc &) {
+        return NULL;
+    }
+#else
+    return new (std::nothrow) directory(id);
+#endif
+}
+
 extern directory *root;
 extern directory *cwd;
 extern directory *eq_dir;

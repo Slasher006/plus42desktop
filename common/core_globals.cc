@@ -805,7 +805,7 @@ directory::~directory() {
 
 directory *directory::clone() {
     int id = get_dir_id();
-    directory *res = new (std::nothrow) directory(id);
+    directory *res = new_directory_nothrow(id);
     if (res == NULL)
         return NULL;
     map_dir(id, res);
@@ -1674,7 +1674,7 @@ bool unpersist_vartype(vartype **v) {
             if (eq == NULL)
                 return false;
             eq->type = TYPE_EQUATION;
-            equation_data *eqd = new (std::nothrow) equation_data;
+            equation_data *eqd = new_equation_data_nothrow();
             if (eqd == NULL) {
                 free(eq);
                 return false;
@@ -1707,7 +1707,7 @@ bool unpersist_vartype(vartype **v) {
                     free(cmdata);
                     goto eq_fail;
                 }
-                eqd->map = new (std::nothrow) CodeMap(cmdata, cmsize);
+                eqd->map = new_CodeMap_nothrow(cmdata, cmsize);
                 if (eqd->map == NULL)
                     goto cm_fail;
             }
@@ -1845,7 +1845,7 @@ static bool persist_directory(directory *dir) {
 }
 
 static bool unpersist_directory(directory **d) {
-    directory *dir = new (std::nothrow) directory(0);
+    directory *dir = new_directory_nothrow(0);
     directory *oldcwd = cwd;
     cwd = dir;
     if (dir == NULL) {

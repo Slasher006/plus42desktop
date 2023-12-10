@@ -41,6 +41,10 @@
 #define F42_BIG_ENDIAN 1
 #endif
 
+#if __APPLE__
+#define BROKEN_NOTHROW 1
+#endif
+
 /* Magic number "24lP" for the state file. */
 #define PLUS42_MAGIC 0x506c3432
 #define PLUS42_MAGIC_STR "24lP"

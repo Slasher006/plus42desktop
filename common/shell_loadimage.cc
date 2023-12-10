@@ -267,7 +267,15 @@ int shell_loadimage(int extra, int dup_first_y, int dup_last_y) {
                 /* Using local color map */
                 lbpp = (info & 7) + 1;
                 lncolors = 1 << lbpp;
+                #if BROKEN_NOTHROW
+                try {
+                    lcmap = new GifColorMap;
+                } catch (std::bad_alloc &) {
+                    lcmap = NULL;
+                }
+                #else
                 lcmap = new (std::nothrow) GifColorMap;
+                #endif
                 // TODO - handle memory allocation failure
                 for (i = 0; i < lncolors; i++) {
                     int r, g, b;
