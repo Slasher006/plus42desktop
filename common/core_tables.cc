@@ -62,9 +62,9 @@
 // XROM 30,37-63 (a7a5-a7bf) (Card Reader)
 // XROM 31,00-63 (a7c0-a7ff) (Data Logger)
 
-// Available XROMs: a7dc, a7dd, a7e0, a7f5 (*)
+// Available XROMs: a6ee, a6fe, a6ff, a7dc, a7dd, a7e0, a7f5 (*), a7fa, a7fb
 // (*) Before reusing a7f5 (formerly NEWSTR), remove it from core_import_programs().
-// Unavailable XROMs (used by Free42): a7fa (CAPS), a7fb (Mixed)
+// Time Module: a681-a6a3, of which we're only using some; see below.
 
 const command_spec cmd_array[] =
 {
@@ -393,39 +393,17 @@ const command_spec cmd_array[] =
 
     /* Time Module & CX Time support*/
     { /* ADATE */      docmd_adate,       "ADATE",               0x00, 0x00, 0xa6, 0x81,  5, ARG_NONE,   1, 0x01 },
-    { /* ALMCAT */     docmd_xrom,        "AL\315CAT",           0x04, 0x00, 0xa6, 0x82,  6, ARG_NONE,   0, UNIM },
-    { /* ALMNOW */     docmd_xrom,        "AL\315N\317W",        0x04, 0x00, 0xa6, 0x83,  6, ARG_NONE,   0, UNIM },
     { /* ATIME */      docmd_atime,       "ATIME",               0x00, 0x00, 0xa6, 0x84,  5, ARG_NONE,   1, 0x01 },
     { /* ATIME24 */    docmd_atime24,     "AT\311\315\30524",    0x00, 0x00, 0xa6, 0x85,  7, ARG_NONE,   1, 0x01 },
     { /* CLK12 */      docmd_clk12,       "CL\31312",            0x00, 0x00, 0xa6, 0x86,  5, ARG_NONE,   0, NA_T },
     { /* CLK24 */      docmd_clk24,       "CL\31324",            0x00, 0x00, 0xa6, 0x87,  5, ARG_NONE,   0, NA_T },
-    { /* CLKT */       docmd_xrom,        "CLKT",                0x04, 0x00, 0xa6, 0x88,  4, ARG_NONE,   0, UNIM },
-    { /* CLKTD */      docmd_xrom,        "CL\313TD",            0x04, 0x00, 0xa6, 0x89,  5, ARG_NONE,   0, UNIM },
-    { /* CLOCK */      docmd_xrom,        "CL\317\303K",         0x04, 0x00, 0xa6, 0x8a,  5, ARG_NONE,   0, UNIM },
-    { /* CORRECT */    docmd_xrom,        "CORR\305\303\324",    0x04, 0x00, 0xa6, 0x8b,  7, ARG_NONE,   0, UNIM },
     { /* DATE */       docmd_date,        "DATE",                0x00, 0x00, 0xa6, 0x8c,  4, ARG_NONE,   0, NA_T },
     { /* DATE_PLUS */  docmd_date_plus,   "DATE+",               0x00, 0x00, 0xa6, 0x8d,  5, ARG_NONE,   2, 0x01 },
     { /* DDAYS */      docmd_ddays,       "DDAYS",               0x00, 0x00, 0xa6, 0x8e,  5, ARG_NONE,   2, 0x01 },
     { /* DMY */        docmd_dmy,         "DMY",                 0x00, 0x00, 0xa6, 0x8f,  3, ARG_NONE,   0, NA_T },
     { /* DOW */        docmd_dow,         "DOW",                 0x00, 0x00, 0xa6, 0x90,  3, ARG_NONE,   1, 0x01 },
     { /* MDY */        docmd_mdy,         "MDY",                 0x00, 0x00, 0xa6, 0x91,  3, ARG_NONE,   0, NA_T },
-    { /* RCLAF */      docmd_xrom,        "RCLAF",               0x04, 0x00, 0xa6, 0x92,  5, ARG_NONE,   0, UNIM },
-    { /* RCLSW */      docmd_xrom,        "RC\314SW",            0x04, 0x00, 0xa6, 0x93,  5, ARG_NONE,   0, UNIM },
-    { /* RUNSW */      docmd_xrom,        "R\325NSW",            0x04, 0x00, 0xa6, 0x94,  5, ARG_NONE,   0, UNIM },
-    { /* SETAF */      docmd_xrom,        "SETAF",               0x04, 0x00, 0xa6, 0x95,  5, ARG_NONE,   0, UNIM },
-    { /* SETDATE */    docmd_xrom,        "S\305\324DATE",       0x04, 0x00, 0xa6, 0x96,  7, ARG_NONE,   0, UNIM },
-    { /* SETIME */     docmd_xrom,        "S\305TIME",           0x04, 0x00, 0xa6, 0x97,  6, ARG_NONE,   0, UNIM },
-    { /* SETSW */      docmd_xrom,        "SE\324SW",            0x04, 0x00, 0xa6, 0x98,  5, ARG_NONE,   0, UNIM },
-    { /* STOPSW */     docmd_xrom,        "ST\317\320SW",        0x04, 0x00, 0xa6, 0x99,  6, ARG_NONE,   0, UNIM },
-    { /* SW */         docmd_xrom,        "SW",                  0x04, 0x00, 0xa6, 0x9a,  2, ARG_NONE,   0, UNIM },
-    { /* T_PLUS_X */   docmd_xrom,        "T+X",                 0x04, 0x00, 0xa6, 0x9b,  3, ARG_NONE,   0, UNIM },
     { /* TIME */       docmd_time,        "TIME",                0x00, 0x00, 0xa6, 0x9c,  4, ARG_NONE,   0, NA_T },
-    { /* XYZALM */     docmd_xrom,        "XYZALM",              0x04, 0x00, 0xa6, 0x9d,  6, ARG_NONE,   0, UNIM },
-    { /* CLALMA */     docmd_xrom,        "CLAL\315A",           0x04, 0x00, 0xa6, 0x9f,  6, ARG_NONE,   0, UNIM },
-    { /* CLALMX */     docmd_xrom,        "CLAL\315X",           0x04, 0x00, 0xa6, 0xa0,  6, ARG_NONE,   0, UNIM },
-    { /* CLRALMS */    docmd_xrom,        "CLRALMS",             0x04, 0x00, 0xa6, 0xa1,  7, ARG_NONE,   0, UNIM },
-    { /* RCLALM */     docmd_xrom,        "RCLALM",              0x04, 0x00, 0xa6, 0xa2,  6, ARG_NONE,   0, UNIM },
-    { /* SWPT */       docmd_xrom,        "SWPT",                0x04, 0x00, 0xa6, 0xa3,  4, ARG_NONE,   0, UNIM },
 
     /* Intel Decimal Floating-Point Math Library: self-test */
     { /* FPTEST */     docmd_fptest,      "FPT\305ST",           0x00, 0x00, 0xa7, 0xd2,  6, ARG_NONE,   0, NA_T },
@@ -442,7 +420,7 @@ const command_spec cmd_array[] =
     { /* BRESET */     docmd_breset,      "BR\305S\305T",        0x00, 0x00, 0xa7, 0xd8,  6, ARG_NONE,   0, NA_T },
     { /* GETKEY1 */    docmd_getkey1,     "G\305TK\305\3311",    0x00, 0x00, 0xa7, 0xd9,  7, ARG_NONE,   0, NA_T },
     { /* LASTO */      docmd_lasto,       "LASTO",               0x00, 0xf5, 0xf2, 0xc8,  5, ARG_NAMED,  0, NA_T },
-    { /* LCLV */       docmd_lclv,        "LCLV",                0x00, 0x71, 0xf2, 0x63,  4, ARG_NAMED,  0, NA_T },
+    { /* LCLV */       docmd_lclv,        "LCLV",                0x00, 0x71, 0xf2, 0x64,  4, ARG_NAMED,  0, NA_T },
 
     /* Useful X-Fcn functions missing from the 42S */
     { /* ANUM */       docmd_anum,        "ANUM",                0x00, 0x00, 0xa6, 0x42,  4, ARG_NONE,   0, NA_T },
@@ -489,8 +467,6 @@ const command_spec cmd_array[] =
     { /* SKIP */       docmd_skip,        "SKIP",                0x00, 0x00, 0xa2, 0x74,  4, ARG_NONE,   0, NA_T },
     { /* CPXMAT_T */   docmd_cpxmat_t,    "C\320\330M\301T?",    0x00, 0x00, 0xa2, 0x75,  7, ARG_NONE,   1, ALLT },
     { /* TYPE_T */     docmd_type_t,      "TYP\305?",            0x00, 0x00, 0xa2, 0x76,  5, ARG_NONE,   1, ALLT },
-    /* (Skipping 403 because of single-byte equality checks with CMD_END) */
-    { /* DUMMY */      NULL,              "",                    0x44, 0x00, 0x00, 0x00,  0, ARG_OTHER,  0, UNIM },
     { /* A_THRU_F_2 */ docmd_a_thru_f,    "A...F",               0x00, 0x00, 0xa7, 0x1b,  5, ARG_NONE,   0, NA_T },
     { /* DROP_CANCL */ docmd_drop_cancl,  "DROP",                0x04, 0x00, 0x00, 0x00,  4, ARG_NONE,   1, ALLT },
     { /* PRREG */      docmd_prreg,       "PRR\305G",            0x00, 0x00, 0xa7, 0x50,  5, ARG_NONE,   0, NA_T },
@@ -618,9 +594,9 @@ const command_spec cmd_array[] =
     { /* UPDIR */      docmd_updir,       "UPDIR",               0x00, 0x00, 0xa6, 0xf9,  5, ARG_NONE,   0, NA_T },
     { /* HOME */       docmd_home,        "HOME",                0x00, 0x00, 0xa6, 0xfa,  4, ARG_NONE,   0, NA_T },
     { /* PATH */       docmd_path,        "PATH",                0x00, 0x00, 0xa6, 0xfb,  4, ARG_NONE,   0, NA_T },
-    { /* REFMOVE */    docmd_refmove,     "R\305\306MOVE",       0x00, 0x00, 0xa6, 0xfe,  7, ARG_NONE,   1, FUNC },
-    { /* REFCOPY */    docmd_refcopy,     "R\305\306COPY",       0x00, 0x00, 0xa6, 0xff,  7, ARG_NONE,   1, FUNC },
-    { /* REFFIND */    docmd_reffind,     "R\305\306FIND",       0x00, 0x00, 0xa6, 0xee,  7, ARG_NONE,   1, FUNC },
+    { /* REFMOVE */    docmd_refmove,     "R\305\306MOVE",       0x4c, 0x00, 0x00, 0x00,  7, ARG_NONE,   1, FUNC },
+    { /* REFCOPY */    docmd_refcopy,     "R\305\306COPY",       0x4c, 0x00, 0x00, 0x00,  7, ARG_NONE,   1, FUNC },
+    { /* REFFIND */    docmd_reffind,     "R\305\306FIND",       0x4c, 0x00, 0x00, 0x00,  7, ARG_NONE,   1, FUNC },
     { /* PRALL */      docmd_prall,       "PRALL",               0x00, 0x00, 0xa6, 0xef,  5, ARG_NONE,   0, NA_T },
 
     /* Big Screen */

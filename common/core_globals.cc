@@ -630,12 +630,12 @@ const menu_spec menus[] = {
                         { 0x1000 + CMD_CRDIR,  0, "" },
                         { 0x1000 + CMD_RENAME, 0, "" } } },
     { /* MENU_DIR_FCN2 */ MENU_NONE, MENU_DIR_FCN1, MENU_DIR_FCN1,
-                      { { 0x1000 + CMD_PGDIR, 0, "" },
-                        { 0x1000 + CMD_PRALL, 0, "" },
-                        { 0x1000 + CMD_NULL,  0, "" },
-                        { 0x1000 + CMD_NULL,  0, "" },
-                        { 0x1000 + CMD_NULL,  0, "" },
-                        { 0x1000 + CMD_NULL,  0, "" } } },
+                      { { 0x1000 + CMD_PGDIR,   0, "" },
+                        { 0x1000 + CMD_PRALL,   0, "" },
+                        { 0x1000 + CMD_NULL,    0, "" },
+                        { 0x1000 + CMD_REFCOPY, 0, "" },
+                        { 0x1000 + CMD_REFMOVE, 0, "" },
+                        { 0x1000 + CMD_REFFIND, 0, "" } } },
     { /* MENU_UNIT_FCN1 */ MENU_NONE, MENU_UNIT_FCN2, MENU_UNIT_FCN2,
                       { { 0x1000 + CMD_CONVERT,   0, "" },
                         { 0x1000 + CMD_UBASE,     0, "" },
@@ -3372,7 +3372,7 @@ void store_command_after(int4 *pc, int command, arg_struct *arg, const char *num
     directory *dir = dir_list[current_prgm.dir];
     if (*pc == -1)
         *pc = 0;
-    else if (dir->prgms[current_prgm.idx].text[*pc] != CMD_END)
+    else if (!dir->prgms[current_prgm.idx].is_end(*pc))
         *pc += get_command_length(current_prgm, *pc);
     if (!store_command(*pc, command, arg, num_str))
         *pc = oldpc;
@@ -3516,7 +3516,7 @@ static int pc_line_convert(int4 loc, int loc_is_pc) {
             if (line >= loc)
                 return pc;
         }
-        if (prgm->text[pc] == CMD_END)
+        if (prgm->is_end(pc))
             return loc_is_pc ? line : pc;
         pc += get_command_length(current_prgm, pc);
         line++;
