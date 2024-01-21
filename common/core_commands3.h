@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Plus42 -- an enhanced HP-42S calculator simulator
- * Copyright (C) 2004-2023  Thomas Okken
+ * Copyright (C) 2004-2024  Thomas Okken
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2,
@@ -43,6 +43,7 @@ int docmd_edit(arg_struct *arg);
 int docmd_editn(arg_struct *arg);
 int docmd_exitall(arg_struct *arg);
 int docmd_e_pow_x_1(arg_struct *arg);
+int docmd_c_e_pow_x_1(arg_struct *arg);
 int docmd_fnrm(arg_struct *arg);
 int docmd_getm(arg_struct *arg);
 int docmd_grow(arg_struct *arg);

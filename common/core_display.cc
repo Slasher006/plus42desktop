@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Plus42 -- an enhanced HP-42S calculator simulator
- * Copyright (C) 2004-2023  Thomas Okken
+ * Copyright (C) 2004-2024  Thomas Okken
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2,
@@ -2695,33 +2695,34 @@ static int ext_disp_cat[] = {
 #if defined(ANDROID) || defined(IPHONE)
 #ifdef FREE42_FPTEST
 static int ext_misc_cat[] = {
-    CMD_A2LINE, CMD_A2PLINE, CMD_FMA,    CMD_LINE,  CMD_PCOMPLX, CMD_PLOT_M,
-    CMD_PRREG,  CMD_RCOMPLX, CMD_SPFV,   CMD_SPPV,  CMD_STRACE,  CMD_TVM,
-    CMD_USFV,   CMD_USPV,    CMD_X2LINE, CMD_ACCEL, CMD_LOCAT,   CMD_HEADING,
-    CMD_FPTEST, CMD_NULL,    CMD_NULL,   CMD_NULL,  CMD_NULL,    CMD_NULL
+    CMD_A2LINE,  CMD_A2PLINE, CMD_C_LN_1_X, CMD_C_E_POW_X_1, CMD_FMA,    CMD_LINE,
+    CMD_PCOMPLX, CMD_PLOT_M,  CMD_PRREG,    CMD_RCOMPLX,     CMD_SPFV,   CMD_SPPV,
+    CMD_STRACE,  CMD_TVM,     CMD_USFV,     CMD_USPV,        CMD_X2LINE, CMD_ACCEL,
+    CMD_LOCAT,   CMD_HEADING, CMD_FPTEST,   CMD_NULL,        CMD_NULL,   CMD_NULL
 };
 #define MISC_CAT_ROWS 4
 #else
 static int ext_misc_cat[] = {
-    CMD_A2LINE, CMD_A2PLINE, CMD_FMA,    CMD_LINE,  CMD_PCOMPLX, CMD_PLOT_M,
-    CMD_PRREG,  CMD_RCOMPLX, CMD_SPFV,   CMD_SPPV,  CMD_STRACE,  CMD_TVM,
-    CMD_USFV,   CMD_USPV,    CMD_X2LINE, CMD_ACCEL, CMD_LOCAT,   CMD_HEADING
+    CMD_A2LINE,  CMD_A2PLINE, CMD_C_LN_1_X, CMD_C_E_POW_X_1, CMD_FMA,    CMD_LINE,
+    CMD_PCOMPLX, CMD_PLOT_M,  CMD_PRREG,    CMD_RCOMPLX,     CMD_SPFV,   CMD_SPPV,
+    CMD_STRACE,  CMD_TVM,     CMD_USFV,     CMD_USPV,        CMD_X2LINE, CMD_ACCEL,
+    CMD_LOCAT,   CMD_HEADING, CMD_NULL,     CMD_NULL,        CMD_NULL,   CMD_NULL
 };
-#define MISC_CAT_ROWS 3
+#define MISC_CAT_ROWS 4
 #endif
 #else
 #ifdef FREE42_FPTEST
 static int ext_misc_cat[] = {
-    CMD_A2LINE, CMD_A2PLINE, CMD_FMA,    CMD_LINE,   CMD_PCOMPLX, CMD_PLOT_M,
-    CMD_PRREG,  CMD_RCOMPLX, CMD_SPFV,   CMD_SPPV,   CMD_STRACE,  CMD_TVM,
-    CMD_USFV,   CMD_USPV,    CMD_X2LINE, CMD_FPTEST, CMD_NULL,    CMD_NULL
+    CMD_A2LINE,  CMD_A2PLINE, CMD_C_LN_1_X, CMD_C_E_POW_X_1, CMD_FMA,    CMD_LINE,
+    CMD_PCOMPLX, CMD_PLOT_M,  CMD_PRREG,    CMD_RCOMPLX,     CMD_SPFV,   CMD_SPPV,
+    CMD_STRACE,  CMD_TVM,     CMD_USFV,     CMD_USPV,        CMD_X2LINE, CMD_FPTEST
 };
 #define MISC_CAT_ROWS 3
 #else
 static int ext_misc_cat[] = {
-    CMD_A2LINE, CMD_A2PLINE, CMD_FMA,    CMD_LINE, CMD_PCOMPLX, CMD_PLOT_M,
-    CMD_PRREG,  CMD_RCOMPLX, CMD_SPFV,   CMD_SPPV, CMD_STRACE,  CMD_TVM,
-    CMD_USFV,   CMD_USPV,    CMD_X2LINE, CMD_NULL, CMD_NULL,    CMD_NULL
+    CMD_A2LINE,  CMD_A2PLINE, CMD_C_LN_1_X, CMD_C_E_POW_X_1, CMD_FMA,    CMD_LINE,
+    CMD_PCOMPLX, CMD_PLOT_M,  CMD_PRREG,    CMD_RCOMPLX,     CMD_SPFV,   CMD_SPPV,
+    CMD_STRACE,  CMD_TVM,     CMD_USFV,     CMD_USPV,        CMD_X2LINE, CMD_NULL
 };
 #define MISC_CAT_ROWS 3
 #endif

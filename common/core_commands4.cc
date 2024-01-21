@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Plus42 -- an enhanced HP-42S calculator simulator
- * Copyright (C) 2004-2023  Thomas Okken
+ * Copyright (C) 2004-2024  Thomas Okken
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2,
@@ -363,19 +363,88 @@ int docmd_j_sub(arg_struct *arg) {
     return ERR_NONE;
 }
 
-static int mappable_ln_1_x(phloat x, phloat *y) {
+static int mappable_ln_1_x_r(phloat x, phloat *y) {
     if (x <= -1)
         return ERR_INVALID_DATA;
     *y = log1p(x);
     return ERR_NONE;
 }
 
+static int mappable_ln_1_x_c(phloat xre, phloat xim, phloat *yre, phloat *yim) {
+    if (xim == 0) {
+        if (xre == -1)
+            return ERR_INVALID_DATA;
+        if (xre > -1) {
+            *yre = log1p(xre);
+            *yim = 0;
+        } else {
+            *yre = log(-(xre + 1));
+            *yim = PI;
+        }
+        return ERR_NONE;
+    } else if (xre == -1) {
+        if (xim > 0) {
+            *yre = log(xim);
+            *yim = PI / 2;
+        } else {
+            *yre = log(-xim);
+            *yim = -PI / 2;
+        }
+        return ERR_NONE;
+    } else {
+        phloat x1re = xre + 1;
+        phloat h = hypot(x1re, xim);
+        phloat bre;
+        phloat s;
+        if (p_isinf(h)) {
+            s = 10000;
+            h = hypot(x1re / s, xim / s);
+            bre = log(h) + log(s);
+        } else {
+            s = 1;
+            bre = log(h);
+        }
+        phloat bim = atan2(xim, x1re);
+        phloat cre = x1re - 1 - xre;
+        phloat dre = cre * x1re / h / h * s;
+        phloat dim = -cre * xim / h / h * s;
+        *yre = bre - dre;
+        *yim = bim - dim;
+        return ERR_NONE;
+    }
+}
+
 int docmd_ln_1_x(arg_struct *arg) {
     vartype *v;
-    int err = map_unary(stack[sp], &v, mappable_ln_1_x, NULL);
+    int err = map_unary(stack[sp], &v, mappable_ln_1_x_r, NULL);
     if (err == ERR_NONE)
         unary_result(v);
     return err;
+}
+
+int docmd_c_ln_1_x(arg_struct *arg) {
+    if (stack[sp]->type == TYPE_REAL && !flags.f.real_result_only) {
+        vartype_real *x = (vartype_real *) stack[sp];
+        if (x->x == -1)
+            return ERR_INVALID_DATA;
+        vartype *res;
+        if (x->x > -1)
+            res = new_real(log1p(x->x));
+        else
+            res = new_complex(log(-(x->x + 1)), PI);
+        if (res == NULL)
+            return ERR_INSUFFICIENT_MEMORY;
+        else {
+            unary_result(res);
+            return ERR_NONE;
+        }
+    } else {
+        vartype *v;
+        int err = map_unary(stack[sp], &v, mappable_ln_1_x_r, mappable_ln_1_x_c);
+        if (err == ERR_NONE)
+            unary_result(v);
+        return err;
+    }
 }
 
 int docmd_posa(arg_struct *arg) {
@@ -1188,17 +1257,59 @@ static int matedit_move(int direction) {
     if (m->type == TYPE_LIST)
         return matedit_move_list((vartype_list *) m, direction);
 
+    vartype *reg_x = sp == -1 ? NULL : stack[sp];
+    bool changed;
+
+    // Note: checking whether the current cell is unchanged, so we can avoid
+    // calling disentangle() unnecessarily. This is so that the matrix editor
+    // can be used to view the contents of a matrix, without duplicating it if
+    // we're not changing it.
+
     if (m->type == TYPE_REALMATRIX) {
         rm = (vartype_realmatrix *) m;
         rows = rm->rows;
         columns = rm->columns;
-    } else  { // TYPE_COMPLEXMATRIX
+        old_n = matedit_i * columns + matedit_j;
+        if (reg_x == NULL) {
+            changed = false;
+        } else if (reg_x->type == TYPE_REAL) {
+            if (rm->array->is_string[old_n] != 0)
+                changed = true;
+            else
+                changed = rm->array->data[old_n] != ((vartype_real *) reg_x)->x;
+        } else if (reg_x->type == TYPE_STRING) {
+            if (rm->array->is_string[old_n] == 0)
+                changed = true;
+            else {
+                char *text;
+                int4 len;
+                get_matrix_string(rm, old_n, &text, &len);
+                vartype_string *s = (vartype_string *) reg_x;
+                changed = !string_equals(text, len, s->txt(), s->length);
+            }
+        } else {
+            return ERR_INVALID_TYPE;
+        }
+    } else { // TYPE_COMPLEXMATRIX
         cm = (vartype_complexmatrix *) m;
         rows = cm->rows;
         columns = cm->columns;
+        old_n = matedit_i * columns + matedit_j;
+        if (reg_x == NULL) {
+            changed = false;
+        } else if (reg_x->type == TYPE_REAL) {
+            changed = cm->array->data[old_n * 2] != ((vartype_real *) reg_x)->x
+                   || cm->array->data[old_n * 2 + 1] != 0;
+        } else if (reg_x->type == TYPE_COMPLEX) {
+            vartype_complex *c = (vartype_complex *) reg_x;
+            changed = cm->array->data[old_n * 2] != c->re
+                   || cm->array->data[old_n * 2 + 1] != c->im;
+        } else {
+            return reg_x->type == TYPE_STRING ? ERR_ALPHA_DATA_IS_INVALID : ERR_INVALID_TYPE;
+        }
     }
 
-    if (!disentangle(m))
+    if (changed && !disentangle(m))
         return ERR_INSUFFICIENT_MEMORY;
 
     new_i = matedit_i;
@@ -1221,10 +1332,7 @@ static int matedit_move(int direction) {
                 if (++new_i >= rows) {
                     end_flag = 1;
                     if (flags.f.grow) {
-                        vartype *m;
-                        int err = matedit_get(&m);
-                        if (err == ERR_NONE)
-                            err = dimension_array_ref(m, rows + 1, columns);
+                        int err = dimension_array_ref(m, rows + 1, columns);
                         if (err != ERR_NONE)
                             return err;
                         new_i = rows++;
@@ -1255,7 +1363,6 @@ static int matedit_move(int direction) {
             break;
     }
 
-    old_n = matedit_i * columns + matedit_j;
     new_n = new_i * columns + new_j;
 
     if (m->type == TYPE_REALMATRIX) {
@@ -1270,22 +1377,19 @@ static int matedit_move(int direction) {
             if (v == NULL)
                 return ERR_INSUFFICIENT_MEMORY;
         }
-        if (sp == -1) {
+        if (!changed) {
             /* There's nothing to store, so leave cell unchanged */
         } else if (stack[sp]->type == TYPE_REAL) {
             if (rm->array->is_string[old_n] == 2)
                 free(*(void **) &rm->array->data[old_n]);
             rm->array->is_string[old_n] = 0;
             rm->array->data[old_n] = ((vartype_real *) stack[sp])->x;
-        } else if (stack[sp]->type == TYPE_STRING) {
+        } else {
             vartype_string *s = (vartype_string *) stack[sp];
             if (!put_matrix_string(rm, old_n, s->txt(), s->length)) {
                 free_vartype(v);
                 return ERR_INSUFFICIENT_MEMORY;
             }
-        } else {
-            free_vartype(v);
-            return ERR_INVALID_TYPE;
         }
     } else { // m->type == TYPE_COMPLEXMATRIX
         if (old_n != new_n) {
@@ -1294,19 +1398,15 @@ static int matedit_move(int direction) {
             if (v == NULL)
                 return ERR_INSUFFICIENT_MEMORY;
         }
-        if (sp == -1) {
+        if (!changed) {
             /* There's nothing to store, so leave cell unchanged */
         } else if (stack[sp]->type == TYPE_REAL) {
             cm->array->data[2 * old_n] = ((vartype_real *) stack[sp])->x;
             cm->array->data[2 * old_n + 1] = 0;
-        } else if (stack[sp]->type == TYPE_COMPLEX) {
+        } else {
             vartype_complex *c = (vartype_complex *) stack[sp];
             cm->array->data[2 * old_n] = c->re;
             cm->array->data[2 * old_n + 1] = c->im;
-        } else {
-            free_vartype(v);
-            return stack[sp]->type == TYPE_STRING ? ERR_ALPHA_DATA_IS_INVALID
-                                              : ERR_INVALID_TYPE;
         }
     }
 

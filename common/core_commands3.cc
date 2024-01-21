@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Plus42 -- an enhanced HP-42S calculator simulator
- * Copyright (C) 2004-2023  Thomas Okken
+ * Copyright (C) 2004-2024  Thomas Okken
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2,
@@ -1029,7 +1029,7 @@ int docmd_exitall(arg_struct *arg) {
     return set_menu_return_err(MENULEVEL_APP, MENU_NONE, true);
 }
 
-static int mappable_e_pow_x_1(phloat x, phloat *y) {
+static int mappable_e_pow_x_1_r(phloat x, phloat *y) {
     *y = expm1(x);
     if (p_isinf(*y) != 0) {
         if (flags.f.range_error_ignore)
@@ -1040,9 +1040,39 @@ static int mappable_e_pow_x_1(phloat x, phloat *y) {
     return ERR_NONE;
 }
 
+static int mappable_e_pow_x_1_c(phloat xre, phloat xim, phloat *yre, phloat *yim) {
+    phloat k = expm1(xre);
+    phloat t = xim;
+    phloat s = sin(t);
+    t = sin(t / 2);
+    t = -2 * t * t;
+    s *= k + 1;
+    if (-t > fabs(k))
+        *yre = k + k * t + t;
+    else
+        *yre = t + k * t + k;
+    *yim = s;
+    if (p_isinf(*yre) || p_isinf(*yim)) {
+        if (flags.f.range_error_ignore) {
+            *yre = p_isnan(*yre) ? 0 : *yre < 0 ? NEG_HUGE_PHLOAT : POS_HUGE_PHLOAT;
+            *yim = p_isnan(*yim) ? 0 : *yim < 0 ? NEG_HUGE_PHLOAT : POS_HUGE_PHLOAT;
+        } else
+            return ERR_OUT_OF_RANGE;
+    }
+    return ERR_NONE;
+}
+
 int docmd_e_pow_x_1(arg_struct *arg) {
     vartype *v;
-    int err = map_unary(stack[sp], &v, mappable_e_pow_x_1, NULL);
+    int err = map_unary(stack[sp], &v, mappable_e_pow_x_1_r, NULL);
+    if (err == ERR_NONE)
+        unary_result(v);
+    return err;
+}
+
+int docmd_c_e_pow_x_1(arg_struct *arg) {
+    vartype *v;
+    int err = map_unary(stack[sp], &v, mappable_e_pow_x_1_r, mappable_e_pow_x_1_c);
     if (err == ERR_NONE)
         unary_result(v);
     return err;
